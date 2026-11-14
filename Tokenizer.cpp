@@ -336,6 +336,28 @@ Token Tokenizer::getToken() {
             token.setKeyword(Keyword::falseKeyword);
         else if (identifier == "str")
             token.setKeyword(Keyword::strKeyword);
+        else if (identifier == "if")
+            token.setKeyword(Keyword::ifKeyword);
+        else if (identifier == "elif")
+            token.setKeyword(Keyword::elifKeyword);
+        else if (identifier == "else")
+            token.setKeyword(Keyword::elseKeyword);
+        else if (identifier == "while")
+            token.setKeyword(Keyword::whileKeyword);
+        else if (identifier == "int")
+            token.setKeyword(Keyword::intKeyword);
+        else if (identifier == "float")
+            token.setKeyword(Keyword::floatKeyword);
+        else if (identifier == "len")
+            token.setKeyword(Keyword::lenKeyword);
+        else if (identifier == "split")
+            token.setKeyword(Keyword::splitKeyword);
+        else if (identifier == "pop")
+            token.setKeyword(Kewbord::popKeyword);
+        else if (identifier == "append")
+            token.setKeyword(Keyword::appendKeyword);
+        else if (identifier == "input")
+            token.setKeyword(Keyword::inputKeyword)
         else
             token.setIdentifier(std::move(identifier));
     } else {
