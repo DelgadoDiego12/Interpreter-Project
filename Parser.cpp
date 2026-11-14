@@ -484,7 +484,7 @@ ExprNode *Parser::inputExpr(){
         if (!closeParenToken.isCloseParen()) {
             die("Parser::inputExpr", "expected ')'", closeParenToken);
         }
-        return new UnaryExprNode(token, postfixExpr());
+        return new InputExpression{token};
 }
 
 ExprNode *Parser::oneArgCall() {
