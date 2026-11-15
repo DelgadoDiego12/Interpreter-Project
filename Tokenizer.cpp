@@ -315,7 +315,8 @@ Token Tokenizer::getToken() {
             character == '*' || character == '/' || character == '%' ||
             character == ';' || character == '(' || character == ')' ||
             character == '>' || character == '<' || character == '{' ||
-            character == '}' || character == ':' || character == ',') {
+            character == '}' || character == ':' || character == ',' ||
+	    character == '[' || character == ']') {
         std::string oneChar = "";
         oneChar = character; //to convert char to string
         token.setSymbol(oneChar);
@@ -353,11 +354,11 @@ Token Tokenizer::getToken() {
         else if (identifier == "split")
             token.setKeyword(Keyword::splitKeyword);
         else if (identifier == "pop")
-            token.setKeyword(Kewbord::popKeyword);
+            token.setKeyword(Keyword::popKeyword);
         else if (identifier == "append")
             token.setKeyword(Keyword::appendKeyword);
         else if (identifier == "input")
-            token.setKeyword(Keyword::inputKeyword)
+            token.setKeyword(Keyword::inputKeyword);
         else
             token.setIdentifier(std::move(identifier));
     } else {

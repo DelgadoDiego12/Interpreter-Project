@@ -18,12 +18,12 @@ public:
     Statement *statement();
     Statement *simpleStatement();
     Statement *compoundStatement();
-    AssignmentStatement *assignmentStatement();
+    Statement *assignmentStatement();
     PrintStatement *printStatement();
-    AppendStatement *appendStatement(); //
+    AppendStatement *appendStatement(); 
     ForStatement *forStatement();
-    IfStatement *ifStatement(); //
-    WhileStatement *whileStatement(); //
+    IfStatement *ifStatement(); 
+    WhileStatement *whileStatement(); 
 
     ExprNode *relExpr();
     ExprNode *relTerm();

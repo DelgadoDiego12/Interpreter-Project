@@ -3,8 +3,8 @@
 
 #include <string>
 #include <vector>
-
 #include "Expr.hpp"
+#include <memory>
 #include "SymbolTable.hpp"
 
 class Statement {
@@ -103,6 +103,17 @@ public:
 private:
     ExprNode *condition;
     Statements *body;
+};
+
+class IndexedAssignmentStatement final : public Statement {
+public:
+    IndexedAssignmentStatement(std::string variableName, ExprNode* index, ExprNode* value)
+    ~IndexedAssignmentStatement() override;
+    void evaluate(SymbolTable &symbolTable) const override;
+private:
+    std::string variableName;
+    ExprNode *indexExpression;
+    ExprNode *valueExpression;
 };
 
 #endif // EXPRINTER_STATEMENTS_HPP

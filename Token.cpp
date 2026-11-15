@@ -106,4 +106,3 @@ void Token::print(std::ostream &output) const {
     else
         output << "uninitialized token";
 }
-

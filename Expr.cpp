@@ -291,7 +291,7 @@ ValueDescriptor * IntegerConversion::evaluate(const SymbolTable &symbolTable) co
         return value;
     }
 
-    if (value->type() == ValueDescriptor::Type::string) {
+    if (value->type() != ValueDescriptor::Type::string) {
         delete value;
         throw std::runtime_error("int() requires an integer or string");
     }
@@ -489,7 +489,19 @@ void ListLiteral::print() const {
 }
 
 ValueDescriptor *ListLiteral::evaluate(const SymbolTable &) const {
-    throw std::runtime_error("not implemented");
+    ListObject *list = new ListObject();
+    ListValueDescriptor *descriptor = new ListValueDescriptor{list};
+    try {
+        for (ExprNode *element : elements) {
+            ValueDescriptor *elementValue = elementExpr->evaluate(symbolTable);
+            list->append(elementValue);
+        }
+    }
+    catch() {
+        delete descriptor
+        throw std::runtime_error("error");
+    }
+    return descriptor;
 }
 
 SubscriptExpression::SubscriptExpression(ExprNode *listExpression, ExprNode *indexExpression) : ExprNode{Token{}},
@@ -508,7 +520,39 @@ void SubscriptExpression::print() const {
 }
 
 ValueDescriptor *SubscriptExpression::evaluate(const SymbolTable &) const {
-    throw std::runtime_error("not implemented");
+    ValueDescriptor *target = listExpression->evaluate(symbolTable);
+    ValueDescriptor *index = nullptr;
+    ValueDescriptor *result = nullptr;
+
+    try{
+        index = indexExpression->evaluate(symbolTable);
+        if (index->type() != ValueDescriptor::Type::integer) {
+            throw std::runtime_error("index is an unvalid value descriptor type must be an integer");
+        }
+        std::int64_t index = static_cast<IntegerValueDescriptor *>(index)->value();
+        if (target->type() == ValueDescriptor::Type::list) {
+            ValueDescriptor *list = static_cast<ListValueDescriptor *>(target)->object();
+            if (index < 0 || index > static_cast<std::int64_t>(list->size())) {
+                throw std::runtime_error("unvalid index, not in range");
+            }
+            result = list->cloneElementAt(static_cast<std::size_t>(index));
+        }
+        else if (target->type() == ValueDescriptor::Type::string) {
+            std::string &text = static_cast<ValueDescriptor *>(target)->value();
+            if (index < 0 || index > static_cast<std::int64_t>(list->size())) {
+                throw std::runtime_error("unvalid index, not in range");
+            }
+            result = new StringValueDescriptor{std::string(1, text[static_cast<stdLLsize_t>(index)])};
+        }
+        else {
+            throw std::runtime_error("invalid value descriptor types used")
+        }
+    }
+    catch () {
+        delete index;
+        delete target;
+        throw;
+    }
 }
 
 FloatConversion::FloatConversion(ExprNode *expression) : ExprNode{Token{}}, expression{expression} {}
@@ -667,7 +711,7 @@ ValueDescriptor *PopConversion::evaluate(const SymbolTable &symbolTable) const {
 
     ValueDescriptor *value = expression->evaluate(symbolTable);
 
-    if (value->type() == ValueDescriptor::Type::list) {
+    if (value->type() != ValueDescriptor::Type::list) {
         delete value;
         throw std::runtime_error("pop() requires a list");
     }
@@ -681,16 +725,21 @@ ValueDescriptor *PopConversion::evaluate(const SymbolTable &symbolTable) const {
 
     ValueDescriptor *result = listValue->object()->pop();
     delete value;
+    
     return result;
 }
 
+InputExpression::InputExpression(Token token, ExprNode *argument) : ExprNode{std::move(token)}, argument{argument} {}
+InputExpression::~InputExpression() { delete argument;}
+void InputExpression::print() const { std::cout << "input()";}
 
-
-
-
-
-
-
-
-
-
+ValueDescriptor *InputExpression::evaluate(const SymbolTable &)const {
+    if (argument != nullptr) {
+        throw std::runtime_error("Invalid argument, input does not take arguments");
+    }
+    std::string line;
+    if (!std::getline(std::cin, line)) {
+        throw std::runtime_error("no more input");
+    }
+    return new StringValueDescriptor{std::move(line)};
+}

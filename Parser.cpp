@@ -133,7 +133,7 @@ Statement *Parser::compoundStatement() {
     die("Parser::compuntStatement", "expected 'for', 'if', or 'while'", token);
 }
 
-AssignmentStatement *Parser::assignmentStatement() {
+Statement *Parser::assignmentStatement() {
     // <assignment-statement> -> <id> = <rel-expr>
     // The caller consumes the context-dependent terminator: NEWLINE in a
     // statement list or ';' in a future for-loop header.
@@ -141,7 +141,21 @@ AssignmentStatement *Parser::assignmentStatement() {
     if (!variable.isIdentifier())
         die("Parser::assignmentStatement", "expected an identifier", variable);
 
-    Token assignmentOperator = tokenizer.getToken();
+    Token token = tokenizer.getToken();
+    if (token.isOpenBracket()) {
+        ExprNode *index = relExpr();
+        Token closeBracket = tokenizer.getToken();
+        if (!closeBracket.isCloseBracket()) {
+            delete index;
+            die("Parser::assignmentStatement", "expected ']'", closeBracket);
+        }
+        Token assignmentOperator = tokenizer.getToken();
+        if (!assignmentOperator.isAssignmentOperator()) {
+            delete index;
+            die("Parser::assignmentStatement", "expected '='", assignmentOperator);
+        }
+        return new IndexedAssignmentStatement(variable.identifier(), index, relExpr());
+    }
     if (!assignmentOperator.isAssignmentOperator())
         die("Parser::assignmentStatement", "expected '='", assignmentOperator);
 
@@ -306,7 +320,7 @@ WhileStatement *Parser::whileStatement() {
     ExprNode *condition = relExpr();
     Token colonToken = tokenizer.getToken();
     if (!colonToken.isColon()) {
-        die ("Parser::whileStatement", "expected 'colon'", whileToken);
+        die ("Parser::whileStatement", "expected 'colon'", colonToken);
     }
     Statements *body = suite();
     return new WhileStatement(condition, body);

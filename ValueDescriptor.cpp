@@ -157,6 +157,34 @@ ValueDescriptor *ListObject::cloneElementAt(std::size_t index) const {
     return elements[index]->clone();
 }
 
+void ListObject::setElement(std::size_t index, ValueDescriptor *value) {
+    ListElementType valueDescriptor = ListElementType::unset;
+
+    if (value == nullptr) {
+        throw std::runtime_error("can't assign to a null value")
+    }
+
+    if (index < 0 && index >= elements.size()) {
+        throw std::runtime_error("index is out of range")
+    }
+    if (value->type() == ValueDescriptor::Type::integer || value->Type::doubleValue) {
+        valueDescriptor = ListElementType::numeric;
+    }
+    if (value->type() == ValueDescriptor::Type::boolean) {
+        valueDescriptor == ListElementType::boolean;
+    }
+    if (value->type() == ValueDescriptor::Type::string) {
+        valueDescriptor == ListElementType::string;
+    }
+    if (category != ListElementType::unset && category != valueDescriptor) {
+        delete value;
+        throw std::runtime_error("List and value must have the same type");
+    }
+    delete elements[index];
+    elements[index] = value;
+
+}
+
 void ListObject::append(ValueDescriptor *value) {
 
     if (value == nullptr) {
@@ -237,5 +265,3 @@ ListObject *ListValueDescriptor::object() {
 const ListObject *ListValueDescriptor::object() const {
     return listObject;
 }
-
-

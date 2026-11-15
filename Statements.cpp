@@ -246,3 +246,47 @@ void WhileStatement::print() const {
     std::cout << ":\n";
     body->print();
 }
+
+IndexedAssignmentStatement::IndexedAssignmentStatement(std::string variableName, ExprNode* index, ExprNode* value) : variableName{std::move(variableName)}, indexExpression {index}, valueExpression{value} {}
+
+IndexedAssignmentStatement::~IndexedAssignmentStatement(){
+    delete indexExpression;
+    delete valueExpression;
+}
+
+void IndexedAssignmentStatement::evaluate(SymbolTable &symbolTable) const {
+    ValueDescriptor* target = symbolTable.getValueFor(variableName)->clone();
+    ValueDescriptor* index = nullptr;
+    try {
+        if (target->type() != ValueDescriptor::Type::list){
+            throw std::runtime_error("Invalid target, list required")
+        }
+        ListObject* list = static_cast<ListValueDescriptor *>(target)->object();
+        index = indexExpression->evaluate(symbolTable);
+        if (index->type() != ValueDescriptor::Type::integer) {
+            throw std::runtime_error("Invalid index, must be an integer")
+        }
+        const std::int64_t idx = static_cast<IntegerValueDescriptor *>(index)->value();
+        if (idx < 0 || idx > static_cast<std::int64_t>(list->size())) {
+            throw std::runtime_error("Invalid index, out of range")
+        }
+        ValueDescriptor *value = valueExpression->evaluate(symbolTable);
+        list->setElement(static_cast<std::size_t>(idx), value);
+
+    }
+    catch {
+        delete index;
+        delete target;
+        throw;
+    }
+    delete index;
+    delete target;
+}
+
+void IndexedAssignmentStatement::print() const {
+    std::cout << variableName << "[";
+    indexExpression->print();
+    std::cout << "] = ";
+    valueExpression->print();
+    std::cout << std:::endl;
+}

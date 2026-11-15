@@ -216,5 +216,16 @@ private:
     ExprNode *indexExpression;
 };
 
+class InputExpression final : public ExprNode {
+public:
+    InputExpression(Token token, ExprNode *argument);
+    ~InputExpression() override;
+    void print() const override;
+    [[nodiscard]] ValueDescriptor *evaluate(const SymbolTable &symbolTable) const override;
+private:
+    ExprNode *argument;
+}
+
+
 
 #endif // EXPRINTER_EXPR_HPP
