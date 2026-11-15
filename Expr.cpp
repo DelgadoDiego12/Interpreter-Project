@@ -314,8 +314,9 @@ ValueDescriptor * IntegerConversion::evaluate(const SymbolTable &symbolTable) co
     auto conversion = std::from_chars(begin, end, result);
 
     if (conversion.ec != std::errc() || conversion.ptr != end) {
+        std::string errorMessage = "invalid integer conversion: " + text;
         delete value;
-        throw std::runtime_error("invalid integer conversion" + text);
+        throw std::runtime_error(errorMessage);
     }
     delete value;
     return new IntegerValueDescriptor{result};
