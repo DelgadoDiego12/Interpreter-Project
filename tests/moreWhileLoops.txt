@@ -1,0 +1,12 @@
+a = 12
+b = 28
+c = 2
+
+while c == 3
+    print c
+
+while a > c
+    c = c * 6
+    print c
+    a = a - c
+    print a
