@@ -1,0 +1,19 @@
+a = 6
+b = 20
+c = 48
+sum = 0
+
+if a + c < 100
+    if b - a < 20
+        print “result is less than 20”
+    else
+        print “reached else”
+
+for m in range (a) :
+    if a > 7
+        print “a is greater than 7”
+    else    
+        for j in range (a - 4):
+            sum = sum + 1
+            print sum
+
