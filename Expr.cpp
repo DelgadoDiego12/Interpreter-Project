@@ -499,7 +499,7 @@ ValueDescriptor *ListLiteral::evaluate(const SymbolTable &symbolTable) const {
     }
     catch(...) {
         delete list;
-        throw std::runtime_error("error");
+        throw;
     }
 }
 
@@ -567,7 +567,7 @@ ValueDescriptor *SubscriptExpression::evaluate(const SymbolTable &symbolTable) c
     catch (...) {
         delete target;
         delete indexValue;
-        throw std::runtime_error("error");
+        throw;
     }
 }
 
