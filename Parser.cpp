@@ -36,7 +36,7 @@ Statements *Parser::statements() {
     Token next = tokenizer.getToken();
 
     while (next.isIdentifier() || next.isPrintKeyword() || next.isForKeyword()
-                               || next.isIfKeyword() || next.isWhileKeyword()) {
+                               || next.isIfKeyword() || next.isWhileKeyword() || next.isAppendKeyword()) {
         tokenizer.ungetToken();
         parsedStatements->addStatement(statement());
         next = tokenizer.getToken();
@@ -72,7 +72,7 @@ Statement *Parser::statement() {
 
    Token token = tokenizer.getToken();
 
-    if (token.isIdentifier() || token.isPrintKeyword()) {
+    if (token.isIdentifier() || token.isPrintKeyword() || token.isAppendKeyword()) {
         tokenizer.ungetToken();
 
         Statement *simple = simpleStatement();

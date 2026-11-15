@@ -1,0 +1,20 @@
+values = [1,2,3]
+
+print values
+print values[0]
+
+values[1] = 99
+append(values, 4)
+
+print values
+
+last = pop(values)
+
+print last
+print values
+
+words = split("Ada   Lovelace   36")
+
+print words
+print len(words)
+print words[1]

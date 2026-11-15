@@ -1,0 +1,17 @@
+a = [1, 2]
+
+b = a
+
+b[0] = 99
+
+print a
+print b
+
+a = [5, 6]
+
+print a
+print b
+
+append(b, 3)
+
+print b

@@ -1,0 +1,9 @@
+line = input()
+count = int(input())
+decimal = float("2.5")
+
+print line
+print count
+print decimal
+print str(count)
+print len(line)
