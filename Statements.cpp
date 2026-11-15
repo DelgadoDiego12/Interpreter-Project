@@ -259,16 +259,16 @@ void IndexedAssignmentStatement::evaluate(SymbolTable &symbolTable) const {
     ValueDescriptor* index = nullptr;
     try {
         if (target->type() != ValueDescriptor::Type::list){
-            throw std::runtime_error("Invalid target, list required")
+            throw std::runtime_error("Invalid target, list required");
         }
         ListObject* list = static_cast<ListValueDescriptor *>(target)->object();
         index = indexExpression->evaluate(symbolTable);
         if (index->type() != ValueDescriptor::Type::integer) {
-            throw std::runtime_error("Invalid index, must be an integer")
+            throw std::runtime_error("Invalid index, must be an integer");
         }
         const std::int64_t idx = static_cast<IntegerValueDescriptor *>(index)->value();
         if (idx < 0 || idx > static_cast<std::int64_t>(list->size())) {
-            throw std::runtime_error("Invalid index, out of range")
+            throw std::runtime_error("Invalid index, out of range");
         }
         ValueDescriptor *value = valueExpression->evaluate(symbolTable);
         list->setElement(static_cast<std::size_t>(idx), value);
@@ -288,5 +288,5 @@ void IndexedAssignmentStatement::print() const {
     indexExpression->print();
     std::cout << "] = ";
     valueExpression->print();
-    std::cout << std:::endl;
+    std::cout << std::endl;
 }

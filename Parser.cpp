@@ -36,8 +36,7 @@ Statements *Parser::statements() {
     Token next = tokenizer.getToken();
 
     while (next.isIdentifier() || next.isPrintKeyword() || next.isForKeyword()
-                               || next.isIfKeyword() || next.isElifKeyword()
-                               || next.isElseKeyword() || next.isWhileKeyword()) {
+                               || next.isIfKeyword() || next.isWhileKeyword()) {
         tokenizer.ungetToken();
         parsedStatements->addStatement(statement());
         next = tokenizer.getToken();
@@ -156,8 +155,8 @@ Statement *Parser::assignmentStatement() {
         }
         return new IndexedAssignmentStatement(variable.identifier(), index, relExpr());
     }
-    if (!assignmentOperator.isAssignmentOperator())
-        die("Parser::assignmentStatement", "expected '='", assignmentOperator);
+    if (!token.isAssignmentOperator())
+        die("Parser::assignmentStatement", "expected '='", token);
 
     return new AssignmentStatement(variable.identifier(), relExpr());
 }

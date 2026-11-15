@@ -218,13 +218,11 @@ private:
 
 class InputExpression final : public ExprNode {
 public:
-    InputExpression(Token token, ExprNode *argument);
-    ~InputExpression() override;
+    explicit InputExpression(Token token);
+    ~InputExpression() override = default;
     void print() const override;
     [[nodiscard]] ValueDescriptor *evaluate(const SymbolTable &symbolTable) const override;
-private:
-    ExprNode *argument;
-}
+};
 
 
 

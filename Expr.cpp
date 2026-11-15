@@ -488,20 +488,19 @@ void ListLiteral::print() const {
     std::cout << "]";
 }
 
-ValueDescriptor *ListLiteral::evaluate(const SymbolTable &) const {
+ValueDescriptor *ListLiteral::evaluate(const SymbolTable &symbolTable) const {
     ListObject *list = new ListObject();
-    ListValueDescriptor *descriptor = new ListValueDescriptor{list};
     try {
         for (ExprNode *element : elements) {
-            ValueDescriptor *elementValue = elementExpr->evaluate(symbolTable);
+            ValueDescriptor *elementValue = element->evaluate(symbolTable);
             list->append(elementValue);
         }
+        return new ListValueDescriptor{list};
     }
-    catch() {
-        delete descriptor
+    catch(...) {
+        delete list;
         throw std::runtime_error("error");
     }
-    return descriptor;
 }
 
 SubscriptExpression::SubscriptExpression(ExprNode *listExpression, ExprNode *indexExpression) : ExprNode{Token{}},
@@ -519,39 +518,56 @@ void SubscriptExpression::print() const {
     std::cout << "]";
 }
 
-ValueDescriptor *SubscriptExpression::evaluate(const SymbolTable &) const {
+ValueDescriptor *SubscriptExpression::evaluate(const SymbolTable &symbolTable) const {
     ValueDescriptor *target = listExpression->evaluate(symbolTable);
-    ValueDescriptor *index = nullptr;
-    ValueDescriptor *result = nullptr;
+    ValueDescriptor *indexValue = nullptr;
 
-    try{
-        index = indexExpression->evaluate(symbolTable);
-        if (index->type() != ValueDescriptor::Type::integer) {
-            throw std::runtime_error("index is an unvalid value descriptor type must be an integer");
+    try {
+        indexValue = indexExpression->evaluate(symbolTable);
+
+        if (indexValue->type() != ValueDescriptor::Type::integer) {
+            throw std::runtime_error("index is an invalid value descriptor type must be an integer");
         }
-        std::int64_t index = static_cast<IntegerValueDescriptor *>(index)->value();
+
+        const std::int64_t index = dynamic_cast<IntegerValueDescriptor *>(indexValue)->value();
+
+        if (index < 0) {
+            throw std::runtime_error("invalid index value");
+        }
+        const std::size_t position = static_cast<std::size_t>(index);
+
         if (target->type() == ValueDescriptor::Type::list) {
-            ValueDescriptor *list = static_cast<ListValueDescriptor *>(target)->object();
-            if (index < 0 || index > static_cast<std::int64_t>(list->size())) {
-                throw std::runtime_error("unvalid index, not in range");
+            auto *list = dynamic_cast<ListValueDescriptor *>(target);
+
+            if (position >= list->object()->size()) {
+                throw std::runtime_error("invalid list index");
             }
-            result = list->cloneElementAt(static_cast<std::size_t>(index));
+            ValueDescriptor *result = list->object()->cloneElementAt(position);
+            delete indexValue;
+            delete target;
+
+            return result;
         }
-        else if (target->type() == ValueDescriptor::Type::string) {
-            std::string &text = static_cast<ValueDescriptor *>(target)->value();
-            if (index < 0 || index > static_cast<std::int64_t>(list->size())) {
-                throw std::runtime_error("unvalid index, not in range");
+        if (target->type() == ValueDescriptor::Type::string) {
+            auto *string = dynamic_cast<StringValueDescriptor *>(target);
+            const std::string &text = string->value();
+
+            if (position >= text.size()) {
+                throw std::runtime_error("invalid string index");
             }
-            result = new StringValueDescriptor{std::string(1, text[static_cast<stdLLsize_t>(index)])};
+            ValueDescriptor *result = new StringValueDescriptor{std::string(1, text[position])};
+
+            delete target;
+            delete indexValue;
+
+            return result;
         }
-        else {
-            throw std::runtime_error("invalid value descriptor types used")
-        }
+        throw std::runtime_error("subscript requires a list or string");
     }
-    catch () {
-        delete index;
+    catch (...) {
         delete target;
-        throw;
+        delete indexValue;
+        throw std::runtime_error("error");
     }
 }
 
@@ -685,7 +701,7 @@ ValueDescriptor *SplitConversion::evaluate(const SymbolTable &symbolTable) const
 
         std::size_t end = start;
 
-        while (end < text.size() && (text[end] == ' ' || text[end] == '\t')) {
+        while (end < text.size() && (text[end] != ' ' && text[end] != '\t')) {
             end++;
         }
         object->append(new StringValueDescriptor{text.substr(start, end - start)});
@@ -729,17 +745,14 @@ ValueDescriptor *PopConversion::evaluate(const SymbolTable &symbolTable) const {
     return result;
 }
 
-InputExpression::InputExpression(Token token, ExprNode *argument) : ExprNode{std::move(token)}, argument{argument} {}
-InputExpression::~InputExpression() { delete argument;}
+InputExpression::InputExpression(Token token) : ExprNode{std::move(token)} {}
+
 void InputExpression::print() const { std::cout << "input()";}
 
 ValueDescriptor *InputExpression::evaluate(const SymbolTable &)const {
-    if (argument != nullptr) {
-        throw std::runtime_error("Invalid argument, input does not take arguments");
-    }
     std::string line;
     if (!std::getline(std::cin, line)) {
-        throw std::runtime_error("no more input");
+        throw std::runtime_error("input reached end of file");
     }
     return new StringValueDescriptor{std::move(line)};
 }

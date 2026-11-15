@@ -107,9 +107,10 @@ private:
 
 class IndexedAssignmentStatement final : public Statement {
 public:
-    IndexedAssignmentStatement(std::string variableName, ExprNode* index, ExprNode* value)
+    IndexedAssignmentStatement(std::string variableName, ExprNode* index, ExprNode* value);
     ~IndexedAssignmentStatement() override;
     void evaluate(SymbolTable &symbolTable) const override;
+    void print() const override;
 private:
     std::string variableName;
     ExprNode *indexExpression;

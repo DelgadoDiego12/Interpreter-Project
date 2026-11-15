@@ -161,20 +161,20 @@ void ListObject::setElement(std::size_t index, ValueDescriptor *value) {
     ListElementType valueDescriptor = ListElementType::unset;
 
     if (value == nullptr) {
-        throw std::runtime_error("can't assign to a null value")
+        throw std::runtime_error("can't assign to a null value");
     }
 
-    if (index < 0 && index >= elements.size()) {
-        throw std::runtime_error("index is out of range")
+    if (index >= elements.size()) {
+        throw std::runtime_error("index is out of range");
     }
-    if (value->type() == ValueDescriptor::Type::integer || value->Type::doubleValue) {
+    if (value->type() == ValueDescriptor::Type::integer || value->type() == ValueDescriptor::Type::doubleValue) {
         valueDescriptor = ListElementType::numeric;
     }
     if (value->type() == ValueDescriptor::Type::boolean) {
-        valueDescriptor == ListElementType::boolean;
+        valueDescriptor = ListElementType::boolean;
     }
     if (value->type() == ValueDescriptor::Type::string) {
-        valueDescriptor == ListElementType::string;
+        valueDescriptor = ListElementType::string;
     }
     if (category != ListElementType::unset && category != valueDescriptor) {
         delete value;
