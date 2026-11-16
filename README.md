@@ -10,4 +10,4 @@ AI Use:
 
 Diego - I used ChatGpt to help with understanding refernce counting from what we were already given. No code was generated using AI
 
-Gabriela - Used ChatGPT to clarify the meaning of rules in the project description I had trouble understanding.
+Gabriela - Used ChatGPT to learn how we take input after reading from a file. No code was generated using AI
